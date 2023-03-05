@@ -3,7 +3,7 @@ import styles from '../ContactItem/ContactItem.module.css';
 
 const ContactItem = ({ name, number, id, onClick }) => {
   return (
-    <li className={styles.item} key={id}>
+    <li className={styles.item}>
       <span>
         {name}: {number}
       </span>

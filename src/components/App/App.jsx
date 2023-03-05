@@ -5,35 +5,45 @@ import { nanoid } from 'nanoid';
 import React, { Component } from 'react';
 import styles from './app.module.css';
 
-const ListItem = [
-  { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
-  { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-  { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-  { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
-];
-
 export class App extends Component {
   state = {
-    contacts: [...ListItem],
+    contacts: [],
     filter: '',
   };
 
-  onSubmmitAddContact = ({ name, number }) => {
+  componentDidMount() {
+    const savedContacts = localStorage.getItem('contacts');
+    const parsedContacts = JSON.parse(savedContacts);
+    if (parsedContacts) {
+      this.setState({ contacts: parsedContacts });
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const { contacts } = this.state;
+    if (prevState.contacts !== contacts) {
+      localStorage.setItem('contacts', JSON.stringify(contacts));
+    }
+  }
+
+  onSubmmitAddContact = ({ name, number }, reset) => {
     const { contacts } = this.state;
     const validContacts = contacts.map(({ name }) => name.toLowerCase());
     const nameToLowerCase = name.toLowerCase();
 
     if (validContacts.includes(nameToLowerCase)) {
       return alert(`${name} is already in contacs.`);
+    } else {
+      const newContact = {
+        name,
+        number,
+        id: nanoid(),
+      };
+      this.setState(prevState => ({
+        contacts: [newContact, ...prevState.contacts],
+      }));
+      reset();
     }
-    const newContact = {
-      name,
-      number,
-      id: nanoid(),
-    };
-    this.setState(prevState => ({
-      contacts: [newContact, ...prevState.contacts],
-    }));
   };
 
   handleChangeFilter = e => {
